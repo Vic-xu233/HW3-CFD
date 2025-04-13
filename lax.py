@@ -10,31 +10,41 @@ def compute_lax_error(Nt,u,u_all,C):
     
     return u,u_all
 
-def showplt(x,u0,u_exact,u,u_all,T,Nt):
-   # 可视化
-    plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用黑体
+def showplt(x, u0, u_exact, u, u_all, T, Nt,Nx):
+    plt.rcParams['font.sans-serif'] = ['SimHei']
     plt.rcParams['axes.unicode_minus'] = False
-    plt.figure(figsize=(8,4))
-    plt.plot(x, u0, '--', label='初始条件', linewidth=1)
-    plt.plot(x, u_exact, label='解析解')
-    plt.plot(x, u, 'o-', label='Lax格式数值解', markersize=3)
-    plt.xlabel('x')
-    plt.ylabel('u')
-    plt.title(f'Lax格式 t = {T}, C = {C}')
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
-    # 构建网格用于3D绘图
+
+    # 创建 1 行 2 列的子图
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+    # ---------------------------
+    # 第一个子图：曲线对比
+    # ---------------------------
+    ax1.plot(x, u0, '--', label='初始条件', linewidth=1)
+    ax1.plot(x, u_exact, label='解析解')
+    ax1.plot(x, u, 'o-', label='Lax格式数值解', markersize=3)
+    ax1.set_xlabel('x')
+    ax1.set_ylabel('u')
+    ax1.set_title(f'Lax格式 t = {T}, C = {C},Nx={Nx}')
+    ax1.legend()
+    ax1.grid(True)
+
+    # ---------------------------
+    # 第二个子图：二维伪彩色图
+    # ---------------------------
     t = np.linspace(0, T, Nt)
     X, T_mesh = np.meshgrid(x, t)
+    im = ax2.pcolormesh(X, T_mesh, u_all, cmap='viridis', shading='auto')
+    
+    # 添加公共颜色条
+    fig.colorbar(im, ax=ax2, label='u(x,t)')
+    ax2.set_xlabel('x')
+    ax2.set_ylabel('t')
+    ax2.set_title('Lax格式数值解演化')
 
-    plt.figure(figsize=(10, 6))
-    plt.pcolormesh(X, T_mesh, u_all, cmap='viridis', shading='auto')
-    plt.colorbar(label='u(x,t)')
-    plt.xlabel('x')
-    plt.ylabel('t')
-    plt.title('Lax格式下 u(x,t) 的二维伪彩色图')
+    # ---------------------------
+    # 整体调整
+    # ---------------------------
     plt.tight_layout()
     plt.show()
 
@@ -43,13 +53,13 @@ a = 1.0                     # 波速（常数）
 L = 3.0                     # 空间总长
 # 网格数量
 #N_values = [400,600,800,1000,1500,1800,2000] #耗散小  斜率（精度阶数）较趋近1
-#N_values = [1000,1500,1800,2000,4000,6000] #耗散更小 斜率更趋近1
+#N_values = [1000,1500,1800,2000,4000,6000] #耗散更小 斜率更趋近1,把第85行画图代码#掉，否则内存溢出
 N_values = [50,100,150,400,600,800,1000]
 dx_list = []
 error_list = []
 
 # 时间
-C = 0.8                   # CFL = a*dt/dx
+C = 1.2                   # CFL = a*dt/dx
 T = 3.0                     # 总模拟时间
 
 for Nx in N_values:
@@ -72,7 +82,7 @@ for Nx in N_values:
     # 误差计算（L2范数）
     err = np.sqrt(np.sum((u - u_exact)**2)*dx )
 
-    showplt(x,u0,u_exact,u,u_all,T,Nt)
+    showplt(x,u0,u_exact,u,u_all,T,Nt,Nx)
 
     dx_list.append(dx)
     error_list.append(err)
