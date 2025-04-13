@@ -42,13 +42,14 @@ def showplt(x,u0,u_exact,u,u_all,T,Nt):
 a = 1.0                     # 波速（常数）
 L = 3.0                     # 空间总长
 # 网格数量
-N_values = [400,600,800,1000,1500,1800,2000]
-#N_values = [50,100,150,400,600,800,1000]
+#N_values = [400,600,800,1000,1500,1800,2000] #耗散小  斜率（精度阶数）较趋近1
+#N_values = [1000,1500,1800,2000,4000,6000] #耗散更小 斜率更趋近1
+N_values = [50,100,150,400,600,800,1000]
 dx_list = []
 error_list = []
 
 # 时间
-C = 0.8                    # CFL = a*dt/dx
+C = 0.8                   # CFL = a*dt/dx
 T = 3.0                     # 总模拟时间
 
 for Nx in N_values:
@@ -71,7 +72,7 @@ for Nx in N_values:
     # 误差计算（L2范数）
     err = np.sqrt(np.sum((u - u_exact)**2)*dx )
 
-    #showplt(x,u0,u_exact,u,u_all,T,Nt)
+    showplt(x,u0,u_exact,u,u_all,T,Nt)
 
     dx_list.append(dx)
     error_list.append(err)
