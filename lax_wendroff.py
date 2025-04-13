@@ -1,11 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def compute_lax_error(Nt,u,u_all,C):
+def compute_lax_wendroff(Nt,u,u_all,C):
     for n in range(Nt):
       u_next = np.zeros_like(u)
       u_all[n, :] = u.copy()
-      u_next = 0.5 * (np.roll(u, -1) + np.roll(u, 1)) - 0.5 * C * (np.roll(u, -1) - np.roll(u, 1))#迭代
+      u_next = (u -
+                  0.5 * C * (np.roll(u, -1) - np.roll(u, 1)) +
+                  0.5 * C**2 * (np.roll(u, -1) - 2*u + np.roll(u, 1)))#迭代
       u = u_next.copy()
     
     return u,u_all
@@ -17,7 +19,7 @@ def showplt(x,u0,u_exact,u,u_all,T,Nt):
     plt.figure(figsize=(8,4))
     plt.plot(x, u0, '--', label='初始条件', linewidth=1)
     plt.plot(x, u_exact, label='解析解')
-    plt.plot(x, u, 'o-', label='Lax格式数值解', markersize=3)
+    plt.plot(x, u, 'o-', label='Lax_wendroff格式数值解', markersize=3)
     plt.xlabel('x')
     plt.ylabel('u')
     plt.title(f'Lax格式 t = {T}, C = {C}')
@@ -34,7 +36,7 @@ def showplt(x,u0,u_exact,u,u_all,T,Nt):
     plt.colorbar(label='u(x,t)')
     plt.xlabel('x')
     plt.ylabel('t')
-    plt.title('Lax格式下 u(x,t) 的二维伪彩色图')
+    plt.title('Lax_wendroff格式下 u(x,t) 的二维伪彩色图')
     plt.tight_layout()
     plt.show()
 
@@ -42,8 +44,7 @@ def showplt(x,u0,u_exact,u,u_all,T,Nt):
 a = 1.0                     # 波速（常数）
 L = 3.0                     # 空间总长
 # 网格数量
-N_values = [400,600,800,1000,1500,1800,2000]
-#N_values = [50,100,150,400,600,800,1000]
+N_values = [50,100,400,600,800,1200,1500]
 dx_list = []
 error_list = []
 
@@ -63,7 +64,7 @@ for Nx in N_values:
     u_all = np.zeros((Nt, Nx))  # 储存每一时刻的 u
 
      #Lax格式
-    u,u_all=compute_lax_error(Nt,u,u_all,C)
+    u,u_all=compute_lax_wendroff(Nt,u,u_all,C)
     
     # 精确解
     u_exact = np.sin(2 * np.pi * (x - a * T))
@@ -71,7 +72,7 @@ for Nx in N_values:
     # 误差计算（L2范数）
     err = np.sqrt(np.sum((u - u_exact)**2)*dx )
 
-    #showplt(x,u0,u_exact,u,u_all,T,Nt)
+    showplt(x,u0,u_exact,u,u_all,T,Nt)
 
     dx_list.append(dx)
     error_list.append(err)
@@ -88,7 +89,6 @@ plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用黑体
 plt.rcParams['axes.unicode_minus'] = False
 plt.figure(figsize=(6, 4))
 plt.plot(log_dx, log_err, 'o-', label=f'拟合斜率 ≈ {p:.2f}')
-#plt.plot(log_dx, np.polyval(np.polyfit(log_dx, log_err, 1), log_dx), '--', label='线性拟合线')
 plt.xlabel('log(Δx)')
 plt.ylabel('log(L2误差)')
 plt.title('Lax格式空间精度阶验证')
