@@ -59,7 +59,7 @@ dx_list = []
 error_list = []
 
 # 时间
-C = 1.2                   # CFL = a*dt/dx
+C = 0.8                   # CFL = a*dt/dx
 T = 3.0                     # 总模拟时间
 
 for Nx in N_values:

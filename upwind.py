@@ -10,31 +10,41 @@ def compute_upwind(Nt,u,u_all,C):
     
     return u,u_all
 
-def showplt(x,u0,u_exact,u,u_all,T,Nt):
-   # 可视化
-    plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用黑体
+def showplt(x, u0, u_exact, u, u_all, T, Nt,Nx):
+    plt.rcParams['font.sans-serif'] = ['SimHei']
     plt.rcParams['axes.unicode_minus'] = False
-    plt.figure(figsize=(8,4))
-    plt.plot(x, u0, '--', label='初始条件', linewidth=1)
-    plt.plot(x, u_exact, label='解析解')
-    plt.plot(x, u, 'o-', label='upwind格式数值解', markersize=3)
-    plt.xlabel('x')
-    plt.ylabel('u')
-    plt.title(f'upwind格式 t = {T}, C = {C}')
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
-    # 构建网格用于3D绘图
+
+    # 创建 1 行 2 列的子图
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+    # ---------------------------
+    # 第一个子图：曲线对比
+    # ---------------------------
+    ax1.plot(x, u0, '--', label='初始条件', linewidth=1)
+    ax1.plot(x, u_exact, label='解析解')
+    ax1.plot(x, u, 'o-', label='Upwind格式数值解', markersize=3)
+    ax1.set_xlabel('x')
+    ax1.set_ylabel('u')
+    ax1.set_title(f'Upwind格式 t = {T}, C = {C},Nx={Nx}')
+    ax1.legend()
+    ax1.grid(True)
+
+    # ---------------------------
+    # 第二个子图：二维伪彩色图
+    # ---------------------------
     t = np.linspace(0, T, Nt)
     X, T_mesh = np.meshgrid(x, t)
+    im = ax2.pcolormesh(X, T_mesh, u_all, cmap='viridis', shading='auto')
+    
+    # 添加公共颜色条
+    fig.colorbar(im, ax=ax2, label='u(x,t)')
+    ax2.set_xlabel('x')
+    ax2.set_ylabel('t')
+    ax2.set_title('Upwind格式数值解演化')
 
-    plt.figure(figsize=(10, 6))
-    plt.pcolormesh(X, T_mesh, u_all, cmap='viridis', shading='auto')
-    plt.colorbar(label='u(x,t)')
-    plt.xlabel('x')
-    plt.ylabel('t')
-    plt.title('upwind格式下 u(x,t) 的二维伪彩色图')
+    # ---------------------------
+    # 整体调整
+    # ---------------------------
     plt.tight_layout()
     plt.show()
 
@@ -70,7 +80,7 @@ for Nx in N_values:
     # 误差计算（L2范数）
     err = np.sqrt(np.sum((u - u_exact)**2)*dx )
 
-    showplt(x,u0,u_exact,u,u_all,T,Nt)
+    showplt(x,u0,u_exact,u,u_all,T,Nt,Nx)
 
     dx_list.append(dx)
     error_list.append(err)
