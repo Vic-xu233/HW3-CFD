@@ -11,16 +11,18 @@ x = np.linspace(0, L, Nx, endpoint=False)
 # 时间
 C = 0.5                     # CFL = a*dt/dx
 dt = C * dx / a
-T = 3.0                     # 总模拟时间
+T = 8.0                     # 总模拟时间
 Nt = int(T / dt)            # 时间网格数量
 
 # 初始条件：u(x,0) = sin(2πx)
 u = np.sin(2 * np.pi * x)
 u0 = u.copy()  # 保存初始解
-
+u_all = np.zeros((Nt, Nx))  # 储存每一时刻的 u
 # Lax格式
 for n in range(Nt):
     u_next = np.zeros_like(u)
+    u_all[n, :] = u.copy()
+
     u_next = 0.5 * (np.roll(u, -1) + np.roll(u, 1)) - 0.5 * C * (np.roll(u, -1) - np.roll(u, 1))#迭代
     u = u_next.copy()
 
@@ -43,5 +45,30 @@ plt.ylabel('u')
 plt.title(f'Lax格式 t = {T}, C = {C}')
 plt.legend()
 plt.grid(True)
+plt.tight_layout()
+plt.show()
+# 构建网格用于3D绘图
+t = np.linspace(0, T, Nt)
+X, T_mesh = np.meshgrid(x, t)
+
+# 画3D图
+fig = plt.figure(figsize=(10, 6))
+ax = fig.add_subplot(111, projection='3d')
+surf = ax.plot_surface(X, T_mesh, u_all, cmap='viridis')
+
+ax.set_xlabel('x')
+ax.set_ylabel('t')
+ax.set_zlabel('u(x,t)')
+ax.set_title('Lax格式下 u(x,t) 的演化曲面图')
+plt.tight_layout()
+plt.show()
+
+
+plt.figure(figsize=(10, 6))
+plt.pcolormesh(X, T_mesh, u_all, cmap='viridis', shading='auto')
+plt.colorbar(label='u(x,t)')
+plt.xlabel('x')
+plt.ylabel('t')
+plt.title('Lax格式下 u(x,t) 的二维伪彩色图')
 plt.tight_layout()
 plt.show()
