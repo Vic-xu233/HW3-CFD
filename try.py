@@ -42,12 +42,12 @@ def showplt(x,u0,u_exact,u,u_all,T,Nt):
 a = 1.0                     # 波速（常数）
 L = 3.0                     # 空间总长
 # 网格数量
-N_values = [50, 100, 200, 400, 800,1000]
+N_values = [50, 100,150, 200, 400,600,800,1000]
 dx_list = []
 error_list = []
 
 # 时间
-C = 0.5                     # CFL = a*dt/dx
+C = 0.8                     # CFL = a*dt/dx
 T = 3.0                     # 总模拟时间
 '''
 x_list=[]
@@ -72,10 +72,11 @@ for Nx in N_values:
     
     # 精确解
     u_exact = np.sin(2 * np.pi * (x - a * T))
-
+     
     # 误差计算（L2范数）
-    err = np.sqrt(np.sum((u - u_exact)**2) * dx)
-    showplt(x,u0,u_exact,u,u_all,T,Nt)
+    err = np.sqrt(np.sum((u - u_exact)**2)*dx )
+
+    #showplt(x,u0,u_exact,u,u_all,T,Nt)
     '''
     x_list.append(x)
     u_list.append(u)
@@ -100,8 +101,10 @@ for i in range(0,2,1):
 log_dx = np.log(dx_list)
 log_err = np.log(error_list)
 p = np.polyfit(log_dx, log_err, 1)[0]
-
+print('拟合斜率 =',p)
 # 可视化
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用黑体
+plt.rcParams['axes.unicode_minus'] = False
 plt.figure(figsize=(6, 4))
 plt.plot(log_dx, log_err, 'o-', label=f'拟合斜率 ≈ {p:.2f}')
 plt.xlabel('log(Δx)')
