@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def compute_lax_error(Nt,u,u_all):
+def compute_lax_error(Nt,u,u_all,C):
     for n in range(Nt):
       u_next = np.zeros_like(u)
       u_all[n, :] = u.copy()
@@ -47,15 +47,9 @@ dx_list = []
 error_list = []
 
 # 时间
-C = 0.8                     # CFL = a*dt/dx
+C = 0.8                    # CFL = a*dt/dx
 T = 3.0                     # 总模拟时间
-'''
-x_list=[]
-u_list=[]
-u0_list=[]
-u_all_list=[]
-u_exact_list=[]
-'''
+
 for Nx in N_values:
     dx = L / Nx                 # 步长
     
@@ -63,37 +57,26 @@ for Nx in N_values:
     Nt = int(T / dt)            # 时间网格数量
     x = np.linspace(0, L, Nx, endpoint=False)
     # 初始条件：u(x,0) = sin(2πx)
-    u = np.sin(2 * np.pi * x)
+    u = np.sin(2 * np.pi * x/L)
     u0 = u.copy()  # 保存初始解
     u_all = np.zeros((Nt, Nx))  # 储存每一时刻的 u
 
      #Lax格式
-    u,u_all=compute_lax_error(Nt,u,u_all)
+    u,u_all=compute_lax_error(Nt,u,u_all,C)
     
     # 精确解
-    u_exact = np.sin(2 * np.pi * (x - a * T))
+    u_exact = np.sin(2 * np.pi * (x - a * T)/L)
      
     # 误差计算（L2范数）
     err = np.sqrt(np.sum((u - u_exact)**2)*dx )
 
     #showplt(x,u0,u_exact,u,u_all,T,Nt)
-    '''
-    x_list.append(x)
-    u_list.append(u)
-    u0_list.append(u0)
-    u_all_list.append(u_all)
-    u_exact_list.append(u_exact_list)
-    '''
+
     dx_list.append(dx)
     error_list.append(err)
     
     print(f"Nx = {Nx}, dx = {dx:.5f}, L2误差 = {err:.5e}")
-'''
-for i in range(0,2,1):
-    showplt(x_list[i],u0_list[i],u_exact_list[i],u_list[i],u_all_list[i],T,Nt)
-    i=i+1
-    
-'''
+
 
 
 
