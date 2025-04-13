@@ -42,7 +42,7 @@ def showplt(x,u0,u_exact,u,u_all,T,Nt):
 a = 1.0                     # 波速（常数）
 L = 3.0                     # 空间总长
 # 网格数量
-N_values = [50, 100,150, 200, 400,600,800,1000]
+N_values = [400,600,800,1000,1500,1800,2000]
 dx_list = []
 error_list = []
 
@@ -57,7 +57,7 @@ for Nx in N_values:
     Nt = int(T / dt)            # 时间网格数量
     x = np.linspace(0, L, Nx, endpoint=False)
     # 初始条件：u(x,0) = sin(2πx)
-    u = np.sin(2 * np.pi * x/L)
+    u = np.sin(2 * np.pi * x)
     u0 = u.copy()  # 保存初始解
     u_all = np.zeros((Nt, Nx))  # 储存每一时刻的 u
 
@@ -65,7 +65,7 @@ for Nx in N_values:
     u,u_all=compute_lax_error(Nt,u,u_all,C)
     
     # 精确解
-    u_exact = np.sin(2 * np.pi * (x - a * T)/L)
+    u_exact = np.sin(2 * np.pi * (x - a * T))
      
     # 误差计算（L2范数）
     err = np.sqrt(np.sum((u - u_exact)**2)*dx )
@@ -76,9 +76,6 @@ for Nx in N_values:
     error_list.append(err)
     
     print(f"Nx = {Nx}, dx = {dx:.5f}, L2误差 = {err:.5e}")
-
-
-
 
 # log-log 拟合
 log_dx = np.log(dx_list)
