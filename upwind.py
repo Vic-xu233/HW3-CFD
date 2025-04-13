@@ -62,7 +62,7 @@ for Nx in N_values:
     u_all = np.zeros((Nt, Nx))  # 储存每一时刻的 u
 
      #Lax格式
-    u,u_all=compute_lax_wendroff(Nt,u,u_all,C)
+    u,u_all=compute_upwind(Nt,u,u_all,C)
     
     # 精确解
     u_exact = np.sin(2 * np.pi * (x - a * T))
